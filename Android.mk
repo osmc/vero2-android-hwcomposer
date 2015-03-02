@@ -4,34 +4,15 @@
 
 LOCAL_PATH := $(call my-dir)
 
-# HAL module implemenation, not prelinked and stored in
-# /system/lib/hw/hwcomposer.amlogic.so
+# HAL module implemenation stored in
+# hw/<OVERLAY_HARDWARE_MODULE_ID>.<ro.product.board>.so
 include $(CLEAR_VARS)
 
-LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
-LOCAL_SHARED_LIBRARIES := liblog libEGL libutils libcutils
-LOCAL_STATIC_LIBRARIES := libomxutil
+LOCAL_MODULE_RELATIVE_PATH := hw
+LOCAL_SHARED_LIBRARIES := liblog libEGL libutils
 LOCAL_SRC_FILES := hwcomposer.cpp
-
-ifneq (,$(wildcard hardware/amlogic/gralloc))
-GRALLOC_DIR := hardware/amlogic/gralloc
-else
-GRALLOC_DIR := hardware/libhardware/modules/gralloc
-endif
-
-LOCAL_C_INCLUDES += \
-    $(GRALLOC_DIR)
-
-ifneq ($(WITH_LIBPLAYER_MODULE),false)
-LOCAL_SHARED_LIBRARIES += libamavutils
-AMPLAYER_APK_DIR=$(TOP)/packages/amlogic/LibPlayer/
-LOCAL_C_INCLUDES += \
-    $(AMPLAYER_APK_DIR)/amavutils/include
-LOCAL_CFLAGS += -DWITH_LIBPLAYER_MODULE=1
-endif
-
-LOCAL_MODULE := hwcomposer.amlogic
+LOCAL_C_INCLUDES += hardware/amlogic/gralloc
+LOCAL_MODULE := hwcomposer.$(TARGET_PRODUCT)
 LOCAL_CFLAGS += -DLOG_TAG=\"hwcomposer\"
 LOCAL_MODULE_TAGS := optional
 include $(BUILD_SHARED_LIBRARY)
-include $(call all-makefiles-under,$(LOCAL_PATH))
